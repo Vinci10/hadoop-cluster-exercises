@@ -3,11 +3,11 @@
 <configuration>
     <property>
         <name>dfs.namenode.name.dir</name>
-        <value>$HADOOP_HOME/data/nameNode</value>
+        <value>hdfs/namenode</value>
     </property>
     <property>
         <name>dfs.datanode.data.dir</name>
-        <value>$HADOOP_HOME/data/dataNode</value>
+        <value>hdfs/datanode</value>
     </property>
     <property>
         <name>dfs.replication</name>
