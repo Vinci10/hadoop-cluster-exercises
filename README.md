@@ -30,7 +30,10 @@ The following service ports will be forwarded to localhost:
 
 #### Run a bash shell in master node:
 
-```docker exec -it hadoop-cluster-exercises_node-master_1 bash``` 
+```
+docker exec -it hadoop-cluster-exercises_node-master_1 bash
+Create HDFS home directory: hdfs dfs -mkdir -p /user/root
+``` 
 
 #### Close hadoop cluster:
 
