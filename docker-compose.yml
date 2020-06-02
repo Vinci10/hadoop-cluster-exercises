@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  node-master:
+    build:
+      context: .
+    hostname: node-master
+    restart: unless-stopped
+    depends_on:
+      - node-worker-1
+    ports:
+      - 9870:9870
+      - 8088:8088
+      - 8188:8188
+    volumes:
+      - hadoop_config:/opt/hadoop/etc/hadoop
+      - ssh_config:/root/.ssh
+    environment:
+      - CLUSTER_NAME=exercises
+      - NODE_TYPE=master
+
+  node-worker-1:
+    build:
+      context: .
+    hostname: node-worker-1
+    restart: unless-stopped
+    volumes:
+      - hadoop_config:/opt/hadoop/etc/hadoop
+      - ssh_config:/root/.ssh
+    environment:
+      - NODE_TYPE=worker
+    ports:
+      - 8042:8042
+      - 9864:9864
+
+volumes:
+  hadoop_config:
+  ssh_config:
