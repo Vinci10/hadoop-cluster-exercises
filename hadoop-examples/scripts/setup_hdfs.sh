@@ -1,0 +1,9 @@
+hdfs dfs -mkdir -p /user/root
+hdfs dfs -mkdir -p /user/root/ex1/input
+hdfs dfs -mkdir -p /user/root/ex2/input
+hdfs dfs -mkdir -p /user/root/ex3/input
+hdfs dfs -mkdir -p /user/root/ex4/input
+hdfs dfs -copyFromLocal /files/ex1/cities.csv /user/root/ex1/input/
+hdfs dfs -copyFromLocal /files/ex2/cities.csv /user/root/ex2/input/
+hdfs dfs -copyFromLocal /files/ex3/grades.csv /user/root/ex3/input/
+hdfs dfs -copyFromLocal /files/ex4/tadeusz.txt /user/root/ex4/input/
