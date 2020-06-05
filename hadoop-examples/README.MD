@@ -13,9 +13,9 @@ Script runs `mvn package` to build the application and `docker cp` command to pu
 
 2. Run specific class with application jar: 
 
-`hadoop -jar <jar_name> <class_name> <hdfs_input_directory> <hdfs_output_directory>`
+`hadoop jar <jar_name> <class_name> <hdfs_input_directory> <hdfs_output_directory>`
 
-ex. `hadoop -jar hadoop.jar hadoop.Exercise1 /user/root/ex1/input/ /user/root/ex1/out`
+ex. `hadoop jar hadoop.jar hadoop.Exercise1 /user/root/ex1/input/ /user/root/ex1/out`
 
 - jar_name - application jar file
 - class_name - class name that contains `main` method
