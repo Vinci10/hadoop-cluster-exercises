@@ -21,10 +21,11 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 public class Exercise2 {
+
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
 
-        public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output,
-                        Reporter reporter) throws IOException {
+        public void map(LongWritable key, Text value,OutputCollector<Text,IntWritable> output,
+                        Reporter reporter) throws IOException{
             String line = value.toString();
             StringTokenizer tokenizer = new StringTokenizer(line, ",");
             IntWritable one = new IntWritable(1);
@@ -39,6 +40,7 @@ public class Exercise2 {
                 }
             }
         }
+
     }
 
     public static class Reduce extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable> {
@@ -52,8 +54,25 @@ public class Exercise2 {
                 sum += values.next().get();
             }
 
+            if (sum <= 5) { return; }
             output.collect(key, new IntWritable(sum));
         }
+    }
+
+    public static class Combine extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable> {
+
+        public void reduce(Text key,
+                           Iterator<IntWritable> values,
+                           OutputCollector<Text, IntWritable> output,
+                           Reporter reporter) throws IOException {
+            int sum = 0;
+            while (values.hasNext()) {
+                sum += values.next().get();
+            }
+
+            output.collect(key, new IntWritable(sum));
+        }
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -62,7 +81,7 @@ public class Exercise2 {
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(IntWritable.class);
         conf.setMapperClass(Map.class);
-        conf.setCombinerClass(Reduce.class);
+        conf.setCombinerClass(Combine.class);
         conf.setReducerClass(Reduce.class);
         conf.setInputFormat(TextInputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
