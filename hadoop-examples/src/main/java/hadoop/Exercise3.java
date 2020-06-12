@@ -22,20 +22,21 @@ import java.util.Iterator;
 public class Exercise3 {
 
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, FloatWritable> {
-        public void map(LongWritable key, Text value, OutputCollector<Text, FloatWritable> output,
+
+        public void map(LongWritable lineNumber,
+                        Text lineOfText,
+                        OutputCollector<Text, FloatWritable> output,
                         Reporter reporter) throws IOException {
-            if (key.get() == 0L) {
+            if (lineNumber.get() == 0L) {
                 return;
             }
-            String line = value.toString();
-            String[] tokens = line.split(",");
-            if (tokens.length != 9) {
-                return;
-            }
-            float finalGrade = Float.parseFloat(tokens[7]);
-            String grade = tokens[8];
-            output.collect(new Text(grade), new FloatWritable(finalGrade));
+            String[] splitParts = lineOfText.toString().split(",");
+            String grade = splitParts[splitParts.length - 1];
+            String finalGrade = splitParts[splitParts.length - 1];
+            float finalGradeNumber = Float.parseFloat(finalGrade);
+            output.collect(new Text(grade), new FloatWritable(finalGradeNumber));
         }
+
     }
 
     public static class Reduce extends MapReduceBase implements Reducer<Text, FloatWritable, Text, FloatWritable> {
@@ -44,15 +45,17 @@ public class Exercise3 {
                            Iterator<FloatWritable> values,
                            OutputCollector<Text, FloatWritable> output,
                            Reporter reporter) throws IOException {
-            float sum = 0;
-            int counter = 0;
+            float sumOfFinalGradesScore = 0;
+            int numberOfGrades = 0;
             while (values.hasNext()) {
-                counter++;
-                sum += values.next().get();
+                numberOfGrades++;
+                sumOfFinalGradesScore += values.next().get();
             }
-
-            output.collect(key, new FloatWritable(sum / counter));
+            if (numberOfGrades != 0) {
+                output.collect(key, new FloatWritable(sumOfFinalGradesScore / numberOfGrades));
+            }
         }
+
     }
 
     public static void main(String[] args) throws Exception {
