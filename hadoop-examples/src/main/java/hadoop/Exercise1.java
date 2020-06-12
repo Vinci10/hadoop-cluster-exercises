@@ -18,44 +18,38 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 public class Exercise1 {
 
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
 
-        public void map(LongWritable key,
-                        Text text,
+        private final IntWritable one = new IntWritable(1);
+
+        public void map(LongWritable lineNumber,
+                        Text lineOfText,
                         OutputCollector<Text, IntWritable> output,
                         Reporter reporter) throws IOException {
-            String lineOfText = text.toString();
-            StringTokenizer tokenizer = new StringTokenizer(lineOfText, ",");
-            IntWritable one = new IntWritable(1);
-            while (tokenizer.hasMoreTokens()) {
-                String stateCode = tokenizer.nextToken().trim();
-                if (stateCode.length() == 2
-                        && stateCode.charAt(0) >= 'A'
-                        && stateCode.charAt(0) <= 'Z'
-                        && stateCode.charAt(1) >= 'A'
-                        && stateCode.charAt(1) <= 'Z') {
-                    output.collect(new Text(stateCode), one);
-                }
+            if (lineNumber.get() == 0L) {
+                return;
             }
+            String[] splitParts = lineOfText.toString().split(",");
+            String stateCode = splitParts[splitParts.length - 1];
+            output.collect(new Text(stateCode), one);
         }
     }
 
     public static class Reduce extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable> {
 
-        public void reduce(Text key,
-                           Iterator<IntWritable> values,
+        public void reduce(Text stateCode,
+                           Iterator<IntWritable> stateOccurrences,
                            OutputCollector<Text, IntWritable> output,
                            Reporter reporter) throws IOException {
             int sumOfCitiesPerState = 0;
-            while (values.hasNext()) {
-                sumOfCitiesPerState += values.next().get();
+            while (stateOccurrences.hasNext()) {
+                sumOfCitiesPerState += stateOccurrences.next().get();
             }
 
-            output.collect(key, new IntWritable(sumOfCitiesPerState));
+            output.collect(stateCode, new IntWritable(sumOfCitiesPerState));
         }
     }
 
