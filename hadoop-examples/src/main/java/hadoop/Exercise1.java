@@ -21,20 +21,24 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 public class Exercise1 {
+
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
-        public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output,
+
+        public void map(LongWritable key,
+                        Text text,
+                        OutputCollector<Text, IntWritable> output,
                         Reporter reporter) throws IOException {
-            String line = value.toString();
-            StringTokenizer tokenizer = new StringTokenizer(line, ",");
+            String lineOfText = text.toString();
+            StringTokenizer tokenizer = new StringTokenizer(lineOfText, ",");
             IntWritable one = new IntWritable(1);
             while (tokenizer.hasMoreTokens()) {
-                String potentialCode = tokenizer.nextToken().trim();
-                if (potentialCode.length() == 2
-                        && potentialCode.charAt(0) >= 'A'
-                        && potentialCode.charAt(0) <= 'Z'
-                        && potentialCode.charAt(1) >= 'A'
-                        && potentialCode.charAt(1) <= 'Z') {
-                    output.collect(new Text(potentialCode), one);
+                String stateCode = tokenizer.nextToken().trim();
+                if (stateCode.length() == 2
+                        && stateCode.charAt(0) >= 'A'
+                        && stateCode.charAt(0) <= 'Z'
+                        && stateCode.charAt(1) >= 'A'
+                        && stateCode.charAt(1) <= 'Z') {
+                    output.collect(new Text(stateCode), one);
                 }
             }
         }
@@ -46,12 +50,12 @@ public class Exercise1 {
                            Iterator<IntWritable> values,
                            OutputCollector<Text, IntWritable> output,
                            Reporter reporter) throws IOException {
-            int sum = 0;
+            int sumOfCitiesPerState = 0;
             while (values.hasNext()) {
-                sum += values.next().get();
+                sumOfCitiesPerState += values.next().get();
             }
 
-            output.collect(key, new IntWritable(sum));
+            output.collect(key, new IntWritable(sumOfCitiesPerState));
         }
     }
 
@@ -69,4 +73,5 @@ public class Exercise1 {
         FileOutputFormat.setOutputPath(conf, new Path(args[1]));
         JobClient.runJob(conf);
     }
+
 }
