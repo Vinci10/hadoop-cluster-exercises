@@ -18,59 +18,55 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 public class Exercise2 {
 
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
 
-        public void map(LongWritable key, Text value,OutputCollector<Text,IntWritable> output,
-                        Reporter reporter) throws IOException{
-            String line = value.toString();
-            StringTokenizer tokenizer = new StringTokenizer(line, ",");
-            IntWritable one = new IntWritable(1);
-            while (tokenizer.hasMoreTokens()) {
-                String potentialCode = tokenizer.nextToken().trim();
-                if (potentialCode.length() == 2
-                        && potentialCode.charAt(0) >= 'A'
-                        && potentialCode.charAt(0) <= 'Z'
-                        && potentialCode.charAt(1) >= 'A'
-                        && potentialCode.charAt(1) <= 'Z') {
-                    output.collect(new Text(potentialCode), one);
-                }
+        private final IntWritable one = new IntWritable(1);
+
+        public void map(LongWritable lineNumber,
+                        Text lineOfText,
+                        OutputCollector<Text, IntWritable> output,
+                        Reporter reporter) throws IOException {
+            if (lineNumber.get() == 0L) {
+                return;
             }
+            String[] splitParts = lineOfText.toString().split(",");
+            String stateCode = splitParts[splitParts.length - 1];
+            output.collect(new Text(stateCode), one);
         }
 
     }
 
     public static class Reduce extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable> {
 
-        public void reduce(Text key,
-                           Iterator<IntWritable> values,
+        public void reduce(Text stateCode,
+                           Iterator<IntWritable> stateOccurrences,
                            OutputCollector<Text, IntWritable> output,
                            Reporter reporter) throws IOException {
-            int sum = 0;
-            while (values.hasNext()) {
-                sum += values.next().get();
+            int sumOfStates = 0;
+            while (stateOccurrences.hasNext()) {
+                sumOfStates += stateOccurrences.next().get();
             }
 
-            if (sum <= 5) { return; }
-            output.collect(key, new IntWritable(sum));
+            if (sumOfStates > 5) {
+                output.collect(stateCode, new IntWritable(sumOfStates));
+            }
         }
     }
 
     public static class Combine extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable> {
 
-        public void reduce(Text key,
-                           Iterator<IntWritable> values,
+        public void reduce(Text stateCode,
+                           Iterator<IntWritable> stateOccurrences,
                            OutputCollector<Text, IntWritable> output,
                            Reporter reporter) throws IOException {
-            int sum = 0;
-            while (values.hasNext()) {
-                sum += values.next().get();
+            int sumOfStates = 0;
+            while (stateOccurrences.hasNext()) {
+                sumOfStates += stateOccurrences.next().get();
             }
-
-            output.collect(key, new IntWritable(sum));
+            output.collect(stateCode, new IntWritable(sumOfStates));
         }
 
     }
