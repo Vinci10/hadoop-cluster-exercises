@@ -8,6 +8,7 @@ import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
@@ -42,6 +43,14 @@ public class Exercise4v2 {
         }
     }
 
+    public static class FileNamePartitioner extends Partitioner<Text, Text> {
+        @Override
+        public int getPartition(Text key, Text value, int numReduceTasks) {
+            String fileName = key.toString().split(DELIMITER)[0];
+            return (fileName.toUpperCase().charAt(0) <= 'M' ? 0 : 1) % numReduceTasks;
+        }
+    }
+
     public static class Map extends Mapper<LongWritable, Text, Text, Text> {
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -65,6 +74,7 @@ public class Exercise4v2 {
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "hadoop-exercise-4");
+        job.setPartitionerClass(FileNamePartitioner.class);
         job.setNumReduceTasks(1);
         job.setJarByClass(Exercise4v2.class);
         job.setOutputKeyClass(Text.class);
