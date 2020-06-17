@@ -5,4 +5,4 @@ Count how many states have more than 5 cities in file `ex2/cities.csv`
 ## Exercise 3
 Count the mean of scores in `Final` column for each grade in file `ex3/grades.csv`
 ## Exercise 4
-Reverse the order of words (eg. `Litwo ojczyzno moja` -> `moja ojczyzna Litwo`) for the content of file `ex4/tadeusz.txt`
+Reverse the order of words (eg. `Litwo ojczyzno moja` -> `moja ojczyzno Litwo`) for the content of file `ex4/tadeusz.txt`
